@@ -60,7 +60,7 @@
 		<form action="delete" method="post">
 			<?= csrf_field(); ?>
 			<input type="hidden" name="num" value="{{$msg["Num"]}}">
-			<input type="hidden" name="page" value="{{$page}}">
+			{{-- <input type="hidden" name="page" value="{{$page}}"> --}}
 			
 		<button type="submit" id ="delete" onclick="processDelete()"
 		class="btn btn-danger"> 삭제하기</button>	

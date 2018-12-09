@@ -14,27 +14,34 @@
 Route::get('/', function () {
     return view('welcome');
 });
+Route::get('bbs/delete/{id}','BBSController@destroy')->name('delete');
+Route::resource('bbs','BBSController');//bbs로 시작하는 모든curf가 실행
 
-Route::get('board', 'BBSController@index');
-
+Route::post('register/update','UserController@store');
+Route::resource('register','UserController');
 Route::get('template', function () {
     return view('layouts.app');
 });
 
-Route::get('view', 'BBSController@show');
+Route::get('/write_form', function(){
+    return view('bbs.write_form');
+});
+Route::get('/Personal_info', function(){
 
-Route::get('modify_form', 'BBSController@edit');
+    return view('Personal_info');
+});
+Route::get('/modify_form', function(){
+    return view('bbs.modify_form');
+});
 
-Route::post('delete', 'BBSController@delete');
+Route::post('/comment', 'BBSController@comment')->name('gallery');
 
-Route::get('write_form', 'BBSController@create');
 
-Route::post('write', 'BBSController@store');
-
-Route::post('modify', 'BBSController@update');
-
-Route::get('gallery', 'MainController@gallery')->name('gallery');
-
+// Route::get('/delete','BBSController@delete');
+Route::get('/gallery', 'MainController@gallery')->name('gallery');
+Route::get('/main','MainController@index')->name('main');
+// Route::get('search', 'MainController@search');
+Route::get('post/{id}', 'MainController@post')->name('post');
 Route::get('/logout',function ()
 {
     Auth::logout();
@@ -43,8 +50,11 @@ Route::get('/logout',function ()
 
 Auth::routes();
 
+Route::get('/redirect', 'SocialAuthGoogleController@redirect');
+Route::get('/callback', 'SocialAuthGoogleController@callback');
+
+Route::get('myArticles','BoardsController@myArticles');
+Route::resource('attachments','AttachmentsController')->only(['store','delete']);
+Route::resource('profiles','ProfilesController')->only(['store','delete']);
+
 Route::get('/home', 'HomeController@index')->name('home');
-
-Route::get('main','MainController@index')->name('main');
-
-// Route::get('main','BBSController@')

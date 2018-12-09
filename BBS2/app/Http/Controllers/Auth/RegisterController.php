@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers\Auth;
-
 use App\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
@@ -28,7 +27,7 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/main';
 
     /**
      * Create a new controller instance.
@@ -49,7 +48,8 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name' => 'required|string|max:255',
+            'Name'=>'required|string|max:255',
+            'nickName' => 'required|string|max:255|unique:users',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
         ]);
@@ -64,9 +64,26 @@ class RegisterController extends Controller
     protected function create(array $data)
     {
         return User::create([
-            'name' => $data['name'],
+            'Name' => $data['Name'],
+            'nickName' => $data['nickName'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
+    }
+    public function update(array $date)
+    {
+        $user = \Auth::user();
+        $file = $request->file('file');
+        
+
+        User::where('email', $user->email)->update([
+            'Name' => $request->Name,
+            'nickName' =>$request->nickName,
+            'profile' => $file,
+            'email' => $request->email,
+            'password' => $request->password,
+        
+        ]);
+        return view('main');
     }
 }

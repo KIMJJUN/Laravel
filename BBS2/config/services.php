@@ -34,5 +34,10 @@ return [
         'key' => env('STRIPE_KEY'),
         'secret' => env('STRIPE_SECRET'),
     ],
+    'google' => [
+        'client_id' => '290890108276-mp7dk115e0tkte3f7e9qvbg2g7rago94.apps.googleusercontent.com',
+        'client_secret' => 'CeskM8Qes1_Tz5W5Jlii4LmD',
+        'redirect' => 'http://jueunstagram.cf/callback'
+    ],
 
 ];

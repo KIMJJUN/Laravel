@@ -1,115 +1,117 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Board;
-
-
+use Illuminate\Support\Facades\Auth;
+use App\Info;
+use App\Attachment;
 class BBSController extends Controller
 {
-    public function index(){
-	 return view('main')-pagenate(5);
-}//index end
-   public function create(){
-      return view('bbs.write_form');
-   }//create end
-
-
-   public function store(Request $request){
-		
-		$file=$request->file('img');
-		$path='img';
-		$file->move($path, $file->getClientOriginalName());
-
-
-		DB::table('info')->insert([
-			'Title'=>$request->title,
-			'Writer'=>$request->writer,
-			'Content'=>$request->content,
-			'Img'=>$file->getClientOriginalName(),
-			
-		]);
-
-		return view('main');
-
-	// require_once("tools.php");
-	// require_once("BoardDao.php");
-
-	// $title = requestValue("title");
-	// $writer = requestValue("writer");
-	// $content = requestValue("content");
-
-
-
-	// if ($title && $writer && $content  ) {
-	// 	$regtime = date("Y-m-d H:i:s");
-	// 	// DB에 insert
-	// 	$dao = new BoardDao();
-	// 	$dao->insertMsg($title, $writer, $content);
-	// 	return redirect('board')->with('message','정상적으로 입력되었습니다');
-	
-	// } else {
-	// 	errorBack("모든 항목이 빈칸 없이 입력되어야 합니다.");
-	// }
-
-
-   }//store end
-
-
-   public function show(){
-   // 	require_once("BoardDao.php");
-	// require_once("tools.php");
-   // 	$num = requestValue("num");
-	// $page = requestValue("page");
-	// $dao = new BoardDao();
-	// $dao->increaseHits($num);
-	// $msg = $dao->getMsg($num);
-	// return view('bbs.view')->with('num',$num)
-	// ->with('page',$page)
-	// ->with('msg',$msg);
-
-	}//show end
-	
-	
-   public function update(){
-   	require_once("BoardDao.php");
-	require_once("tools.php");
-
-	$content = requestValue("content");	
-	$title = requestValue("title");
-	$num = requestValue("num");
-	$writer = requestValue("writer");
-
-	if($content && $title && $writer) {
-		$dao = new BoardDao();
-		$dao->updateMsg($num, $title, $writer, $content);
-		return redirect('board')->with('message','게시글이 수정되었습니다');
-
-	} else {
-		errorBack("모든 항목이 빈칸 없이 입력되어야 합니다.");
+	public function __construct() {
+		$this->middleware('auth');
 	}
-   }//update end
-   public function edit(){
-   	require_once("tools.php");
-	require_once("BoardDao.php");
-   	$num = requestValue("num");	
-	$dao = new BoardDao();
-	$msg = $dao->getMsg($num);
-   	return view('bbs.modify_form')->with('num',$num)
-   	->with('msg',$msg);
+    public function index(Request $request) {
+    	
+    	return redirect(route('main'));
+    }
+    public function show(Request $request, $id) {
+		
+		
+		$msg = Info::find($id);
+		$msg->hits = $msg->hits + 1;
+		$msg->save();
+		return view('bbs.view')->with('msg', $msg);
+	}
+	
+	public function edit(Request $request, $row) {
 
-   }//edit end
-   public function delete(){
-	require_once("tools.php");
-	require_once("BoardDao.php");
+		$row = Info::find($row);
+		// return $row;
+		return view('bbs.modify_form')->with("row", $row);
+	}
+	
+    public function update(Request $request) {
 
-	$num = requestValue("num");
-	$dao = new BoardDao();
+	    $content = $request->get('content');
+	    
+		$this->validate($request, ['content'=>'required']);	  
+		//$msg = Info::find($request->$id);
+		$msg= DB::table('attachments')->where('id',$request->info_id)->get();
+		//DB::statement('ALTER TABLE attachments DISABLE CONSTRAINT info_id CASCADE');
+		DB::statement('SET FOREIGN_KEY_CHECKS=0');
+    	$msg= DB::table('infos')->where('id',$request->info_id)->update(['content'=>$content]);
+ 	    if($request->has('attachments')) {
+		    foreach($request->attachments as $aid) {
+		    	$attach = Attachment::find($aid);
+		    	$attach->info()->associate($msg);
+		    	$attach->save();
+		    }
+		} 
+		
+		DB::statement('SET FOREIGN_KEY_CHECKS=1');
+        return redirect(route('main'));
+  	
+	}
+	
+    public function create() {
+    	return view('bbs.write_form');
+	}
+	
+    public function store(Request $request) {
+	    
+	    $content = $request->get('content');
+		
+		$this->validate($request, ['content'=>'required']);	
+	      
+	    $board = new Info();
+		$board->user_id = Auth::user()->id;
+		$board->Writer = Auth::user()->nickName;
+	    $board->content = $content;
+	    $board->save();
+	     if($request->has('attachments')) {
+		    foreach($request->attachments as $aid) {
+		    	$attach = Attachment::find($aid);
+		    	$attach->info()->associate($board);
+		    	$attach->save();
+		    }
+		}
+	    return redirect('main');
+	    
+	}
 
-	$dao->deleteMsg($num);
+	public function nav(){
+		$user = \Auth::user()->nickName();
+		
+		$writer = DB::table('infos')->select('Writer', $user)->get();
+		return redirect('main')->with('writer',$writer);
 
-	return redirect('board?page=$page')->with('message','삭제되었습니다.');
-   }//delete end
+	}
+
+    public function destroy(Request $request) {
+		$id = $request->id;
+		$aa = DB::table('attachments')->where('info_id', '=', $id)->delete();
+		$msg = Info::find($id);
+		$msg->delete();
+		
+		return redirect('main');
+		// return $aa;
+	}
+	
+    public function myArticles(Request $request) {
+		$user = Auth::user();
+		
+    	$msgs = $user->infos()->orderBy('Regtime', 'desc')->with('user');
+   
+    	return view('main')->with('msgs', $msgs);   	
+	}
+	
+	public function comment(Request $request){
+		DB::table('comments')->insert(
+			[	
+				'board_num'=>$request->board_num,
+				'writer'=>$request->writer,
+				're_memo'=>$request->re_memo
+			]);
+			return $request;
+	}
 }

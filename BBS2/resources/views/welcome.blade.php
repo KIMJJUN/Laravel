@@ -5,26 +5,25 @@
 	<title>Document</title>
 	<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
+	<link href="https://fonts.googleapis.com/css?family=Lobster+Two" rel="stylesheet">
 	<style>
-	body#LoginForm{ background-image: url("img/iphone.png"); background-repeat:no-repeat; background-position:center; background-size:cover; padding:1%; background-size: 100%;  margin: 2%; overflow: hidden;}
+	body#LoginForm{ background-image: url("img/iphone.png"); background-repeat:no-repeat; background-position:center; background-size:cover;  background-size: 100%;  margin: 1%; overflow: hidden;}
 
-	.panel h2{ color:#444444; font-size:18px; margin:50px 0 0px 0;}
-	.panel p { color:#777777; font-size:14px; margin-bottom:0px; line-height:24px;}
+
+
 	.login-form .form-control {
+		
   		background: #f7f7f7 none repeat scroll 0 0;
   		border: 1px solid #d4d4d4;
   		border-radius: 4px;
-  		font-size: 14px;
-  		height: 50px;
+
   		
 		}
 	.main-div {
-  		
-  		
-  		margin: 20px auto 30px;
+  		margin: -3% auto -5%;
   		max-width: 38%;
-  		padding: 60px 70px 30px 70px;
+
+  		padding: 140px 140px;
 		}	
 
 
@@ -34,58 +33,55 @@
   font-size: 14px;
   text-decoration: underline;
 }
-.login-form  .btn.btn-primary {
-  background: #4c34d3 none repeat scroll 0 0;
-  border-color: #4c34d3;
-  color: #ffffff;
-  font-size: 18px;
-  width: 100%;
-  height: 50px;
-  line-height: 50px;
-  padding: 0;
-}
+
 .sign {
   text-align: left; margin-bottom:30px;
 }
-
+.font_justagram{
+	font-family: 'Lobster Two', cursive;
+}
 
 	</style>
 </head>
 
 
 <body id="LoginForm">
+		
+		<h1 class="font_justagram" style="text-align: center; font-size: 80px; margin-top: 1%; "> <i class="fa fa-instagram" style="font-size:60px"></i>  Jueunstagram</h1>
+<div class="login-form " >
+	<div class="main-div">
+
+		<h2 class= "font_justagram" style="font-size: 40px;">Jueunstagram</h2><br>
+
 	
-		<h1 style="text-align: center; font-family: 'billabong'; font-size: 80px; margin-top: -20px; "> <i class="fa fa-instagram" style="font-size:60px"></i>  Jueunstagram</h1>
-	
-<div class="container">
-<div class="login-form">
-<div class="main-div">
-    <div class="panel">
-   <h2 style="font-size: 40px; margin-top: 30px; font-family: 'billabong';">Interstella</h2><br>
-   <p>Please enter your Id and Password</p><br>
-   </div>
-    <form id="Login" action="{{ route('login') }}" method="post">
-        @csrf
-        <div class="form-group">
+		<form id="Login" action="{{ route('login') }}" method="post">
+			@csrf
+			<div class="form-group">
 
 
-            <input type="text" class="form-control" name="email" placeholder="UserName"  value="{{ old('email') }}">
+				<input type="text" class="form-control" name="email" placeholder="UserName"  value="{{ old('email') }}">
 
-        </div>
+			</div>
 
-        <div class="form-group">
+			<div class="form-group">
 
-            <input type="password" class="form-control" name="pw" placeholder="Password">
+				<input type="password" class="form-control" name="password" placeholder="Password">
 
-        </div>
-        <div class="sign">
-        <a href="/register">아직 회원이 아니신가요?</a>
+			</div>
+			<button type="submit" class="btn btn-primary" style="width:100%;">Login</button>
+			<div class="sign mt-2">
+			<a href="/register">아직 회원이 아니신가요?</a>
+			<hr>
+			</div>
+			{{-- <button class="btn btn-danger" onclick="location.href='{{ url('/redirect') }}'" style="color:white; width:100%"><i class="fa fa-google-plus" style="font-size:18px;color:white"></i> &nbsp;&nbsp; Google로 로그인</button> --}}
+			
+			<a href="{{ url('/redirect/google') }}"  style="color:white;width:100%" class="btn btn-danger"><i class="fa fa-google-plus" style="font-size:18px;color:white"></i> &nbsp;&nbsp; Google로 로그인</a>
+			<a href="{{ url('/redirect/instagram') }}" class="btn btn-secondary" style=" width:100%; margin-top:2%"><i class="fa fa-instagram" style="font-size:18px;"></i> &nbsp;&nbsp; Instagram으로 로그인</a>
+			
+		</form>
+	</div>
 </div>
-        <button type="submit" class="btn btn-primary">Login</button>
-    </form>
-    </div>
 
-</div></div></div>
 
 		 <!-- 
 		 1. Request에서 id와 password 값이 있는지 check...
